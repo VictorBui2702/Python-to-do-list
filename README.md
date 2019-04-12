@@ -7,11 +7,11 @@ Requirements
 [x] Todos added, by default should be marked as incomplete.
 [x] The user should see a message giving information about the todo that was added.
 [x] The user can call a function called mark_complete and pass the id of the todo to mark complete. 
-[ ] The user can see all todos from the command line by passing a list command, sorted with the ones due first. 
-[ ] The user can supply arguments to the list command to only see todos that are complete. 
-[ ] The user can supply arguments to the list command to only see todos of a particular project_id. 
-[ ] The user can supply arguments to the list command to reverse the default sort, to now see the todos by due_date descending.
-[ ] The user can supply arguments to the list command to combine the above options.
+[x] The user can see all todos from the command line by passing a list command, sorted with the ones due first. 
+[x] The user can supply arguments to the list command to only see todos that are complete. 
+[x] The user can supply arguments to the list command to only see todos of a particular project_id. 
+[x] The user can supply arguments to the list command to reverse the default sort, to now see the todos by due_date descending.
+[x] The user can supply arguments to the list command to combine the above options.
 
 Optional Requirements
 [ ] The user can add a project by calling add_project. Each project must have a name. 
