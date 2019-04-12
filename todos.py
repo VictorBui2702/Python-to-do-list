@@ -18,7 +18,9 @@ def db_create():
     sql = """
        CREATE TABLE IF NOT EXISTS todos (
            id INTEGER PRIMARY KEY, 
-           todo_text text NOT NULL
+           tasks text NOT NULL,
+           due_date DATETIME,
+           status TEXT DEFAULT "incomplete"
        )  
     """
     cur = con.cursor()
@@ -28,11 +30,35 @@ def db_create():
 def add_todo(todo_text):
     con = db_connect()
     sql = """
-        INSERT INTO todos (todo_text)
+        INSERT INTO todos (tasks)
         VALUES (?)
     """
     cur = con.cursor()
     cur.execute(sql, (todo_text,) )
+    con.commit() 
+
+
+    select_sql = """
+        SELECT * from todos;
+    """
+    cur.execute(select_sql) 
+    results = cur.fetchall()
+    print(results[-1])
+
+    con.close()
+
+
+def add_due_date(id, due_date):
+    con = db_connect()
+    
+    sql = """
+        UPDATE todos
+        where id = ?
+        SET due_date = ?
+    """
+    value = (id, due_date)
+    cur = con.cursor()
+    cur.execute(sql, value )
     con.commit() 
 
     select_sql = """
@@ -52,10 +78,7 @@ def del_todo():
         DELETE FROM todos WHERE id = (?);
     """
     cur = con.cursor()
-    cur.execute(del_sql, (3,)) 
-    # results = cur.fetchall()
-    # for row in results:
-    #     print(row)
+    cur.execute(del_sql, (2,)) 
     con.commit() 
     
     select_sql = """
@@ -67,6 +90,33 @@ def del_todo():
         print(row)
     
     con.close()
+
+
+def mark_complete(id):
+    con = db_connect()
+    sql = """
+        UPDATE todos
+        SET status = CASE status
+                     WHEN 'incomplete' THEN 'complete'
+                     ELSE   'incomplete'
+                     END
+        WHERE id = ?
+    """
+    value = (id,)
+    cur = con.cursor()
+    cur.execute(sql, value )
+    con.commit() 
+
+    select_sql = """
+        SELECT * from todos;
+    """
+    cur.execute(select_sql) 
+    results = cur.fetchall()
+    for row in results:
+        print(row)
+
+    con.close()
+
 
 
 db_create()
