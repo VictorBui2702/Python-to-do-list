@@ -13,6 +13,7 @@ def db_connect(db_path=DEFAULT_PATH):
     con = sqlite3.connect(db_path)
     return con
 
+#create todo list
 def db_create():
     con = db_connect()
     sql = """
@@ -148,6 +149,7 @@ def list_tasks(status="", project_id="", due_date_order=""):
     con = db_connect() 
     cur = con.cursor()
 
+    # list sorted by status
     if  project_id == "" and due_date_order == "":
         select_sql = """
             SELECT * from todos
@@ -155,6 +157,7 @@ def list_tasks(status="", project_id="", due_date_order=""):
         """
         cur.execute(select_sql, (status,)) 
 
+    # list sorted by project_id
     elif  status == "" and due_date_order == "":
         select_sql = """
             SELECT * from todos
@@ -162,13 +165,30 @@ def list_tasks(status="", project_id="", due_date_order=""):
         """
         cur.execute(select_sql, (project_id,)) 
 
-# Regarding sorting out the list by due date, we could not supply the argument due_date_order, instead we could only hard code it as ASC or DESC?!?!
+    # list by due date ASC
     elif  status == "" and project_id == "":
         select_sql = """
             SELECT * from todos
             ORDER BY due_date ASC 
         """
         cur.execute(select_sql, (due_date_order,)) 
+
+    # list by due date DESC
+    elif  status == "" and project_id == "":
+        select_sql = """
+            SELECT * from todos
+            ORDER BY due_date ASC 
+        """
+        cur.execute(select_sql, (due_date_order,)) 
+
+    # list sorted by status and project_id
+    elif  due_date_order == "":
+        select_sql = """
+            SELECT * from todos
+            WHERE status = (?) AND project_id = (?)
+        """
+        value = (status,project_id)
+        cur.execute(select_sql, value )  
 
     results = cur.fetchall()
     for row in results:
@@ -223,6 +243,94 @@ def drop_column():
     con.close()
 
 db_create()
+
+#create project list
+def db_create_project():
+    con = db_connect()
+    sql = """
+       CREATE TABLE IF NOT EXISTS projects (
+           id INTEGER PRIMARY KEY, 
+           projects TEXT NOT NULL,
+           due_date DATETIME,
+           status TEXT DEFAULT "incomplete"
+       )  
+    """
+    cur = con.cursor()
+    cur.execute(sql)
+    con.close()
+
+def add_project(id, projects, due_date):
+    con = db_connect()
+    sql = """
+        INSERT INTO projects (id, projects, due_date)  
+        VALUES (?,?,?)
+    """
+    cur = con.cursor()
+    cur.execute(sql, (id, projects, due_date) )
+    con.commit() 
+
+    select_sql = """
+        SELECT * from projects
+    """
+    cur.execute(select_sql) 
+    results = cur.fetchall()
+    print(results[-1])
+
+    con.close()
+
+db_create_project()
+
+# Update due date of the project
+def update_project_due_date(due_date, id):
+    con = db_connect()
+    
+    sql = """
+        UPDATE projects
+        SET due_date= (?)
+        WHERE id = (?)
+    """
+
+    value = (due_date, id,)
+
+    cur = con.cursor()
+    cur.execute(sql, value )
+    con.commit() 
+
+    select_sql = """
+        SELECT * from projects
+    """
+    cur.execute(select_sql) 
+    results = cur.fetchall()
+    for row in results:
+        print(row)
+
+    con.close()
+
+# Update name of the project
+def update_project_name(projects, id):
+    con = db_connect()
+    
+    sql = """
+        UPDATE projects
+        SET projects= (?)
+        WHERE id = (?)
+    """
+
+    value = (projects, id,)
+
+    cur = con.cursor()
+    cur.execute(sql, value )
+    con.commit() 
+
+    select_sql = """
+        SELECT * from projects
+    """
+    cur.execute(select_sql) 
+    results = cur.fetchall()
+    for row in results:
+        print(row)
+
+    con.close()
 
 if __name__ == '__main__':
     # fire.Fire({
